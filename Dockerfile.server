@@ -10,13 +10,15 @@ COPY package.json package-lock.json ./
 # --ignore-scripts: skip prepare script (husky/env.ts not needed in Docker)
 RUN npm ci --ignore-scripts
 
-# Copy source code
-COPY tsconfig.path.json tsconfig.server.json ./
+# Copy source code and config
+COPY tsconfig.json tsconfig.path.json tsconfig.server.json ./
+COPY scripts/ scripts/
 COPY src/ src/
 COPY server/ server/
 
-# Build the server
-RUN npx tsc -p tsconfig.server.json && \
+# Generate validate-fns.js (AJV schema validators) then build server
+RUN npx ts-node scripts/setup.ts && \
+    npx tsc -p tsconfig.server.json && \
     npx tsc-alias -p tsconfig.server.json
 
 # Stage 2: Production image
