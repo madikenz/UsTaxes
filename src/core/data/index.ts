@@ -6,7 +6,9 @@ export enum TaxYears {
   Y2021 = 2021,
   Y2022 = 2022,
   Y2023 = 2023,
-  Y2024 = 2024
+  Y2024 = 2024,
+  Y2025 = 2025,
+  Y2026 = 2026
 }
 
 export type TaxYear = keyof typeof TaxYears
@@ -125,16 +127,23 @@ export interface F1099BData {
   shortTermCostBasis: number
   longTermProceeds: number
   longTermCostBasis: number
+  federalIncomeTaxWithheld?: number
 }
 
 export interface F1099IntData {
   income: number
+  federalIncomeTaxWithheld?: number
+  earlyWithdrawalPenalty?: number // Box 2
 }
 
 export interface F1099DivData {
   dividends: number
   qualifiedDividends: number
   totalCapitalGainsDistributions: number
+  federalIncomeTaxWithheld?: number
+  unrecapturedSection1250Gain?: number // Box 2d
+  collectibles28PctGain?: number // Box 2e (28% rate gain distributions)
+  section199ADividends?: number // Box 5
 }
 /*
  TODO: Add in logic for various different distributions
@@ -162,11 +171,27 @@ export const PlanType1099Texts: { [k in keyof typeof PlanType1099]: string } = {
   Pension: '401(k), 403(b), or 457(b) plan'
 }
 
+// Simplified Method Worksheet data for pension/annuity 1099-R
+// Used when box 2a (taxable amount) needs to be calculated
+export interface SimplifiedMethodData {
+  costInPlan: number // Line 2: cost (investment) in the plan at annuity starting date
+  ageAtAnnuityStart: number // Age at annuity starting date (for Table 1)
+  combinedAgesAtStart?: number // Combined ages (for Table 2, joint/survivor annuity)
+  useTable2: boolean // true if joint/survivor annuity after 11/18/1996
+  annuityStartedBefore19861231: boolean // true if annuity starting date before 1987
+  annuityStartedBefore19961119: boolean // true if annuity starting date before 11/19/1996
+  monthsOfPayments: number // Line 5: number of months payments were made this year
+  priorYearTaxFreeRecovery: number // Line 6: amount recovered tax free in years after 1986
+}
+
 export interface F1099RData {
   grossDistribution: number
   taxableAmount: number
+  taxableAmountNotDetermined?: boolean // box 2b: taxable amount not determined
+  simplifiedMethodData?: SimplifiedMethodData // used when taxableAmountNotDetermined
   federalIncomeTaxWithheld: number
   planType: PlanType1099
+  distributionCode?: string // Box 7 (code D = annuity subject to NIIT)
 }
 
 export interface F1099SSAData {
@@ -444,6 +469,12 @@ export interface ScheduleK1Form1065 {
   selfEmploymentEarningsC: number // Schedule SE (Form 1040)
   distributionsCodeAAmount: number // If the amount shown as code A exceeds the adjusted basis of your partnership interest immediately before the distribution, the excess is treated as gain from the sale or exchange of your partnership interest. Generally, this gain is treated as gain from the sale of a capital asset and should be reported on Form 8949 and the Schedule D for your return.
   section199AQBI: number // Form 8995 or 8995-A
+  shortTermCapitalGains?: number // Box 8 — Schedule D, line 5
+  longTermCapitalGains?: number // Box 9a — Schedule D, line 12
+  collectibles28PctGain?: number // Box 9b — 28% rate gain (collectibles)
+  unrecapturedSection1250Gain?: number // Box 9c — Unrecaptured section 1250 gain
+  qualifiedReitDividends?: number // Box 20 Code AB — for F8995 QBI
+  publiclyTradedPartnershipIncome?: number // Box 20 Code Z — for F8995 PTP
 }
 
 export interface ItemizedDeductions {
@@ -459,6 +490,10 @@ export interface ItemizedDeductions {
   investmentInterest: string | number
   charityCashCheck: string | number
   charityOther: string | number
+  charityCarryover?: string | number
+  casualtyAndTheftLosses?: string | number
+  otherItemizedDeductions?: string | number
+  otherTaxes?: string | number
 }
 
 export type State =
@@ -559,6 +594,550 @@ export interface Credit {
   type: CreditType
 }
 
+// --- Form 1099-NEC (Nonemployee Compensation) ---
+export interface F1099NECData {
+  nonemployeeCompensation: number // Box 1
+  federalIncomeTaxWithheld: number // Box 4
+}
+
+// --- Form 1099-MISC (Miscellaneous Income) ---
+export interface F1099MISCData {
+  rents: number // Box 1
+  royalties: number // Box 2
+  otherIncome: number // Box 3
+  federalIncomeTaxWithheld: number // Box 4
+  fishingBoatProceeds: number // Box 5
+  medicalPayments: number // Box 6
+  substitutePayments: number // Box 8
+  cropInsurance: number // Box 9
+  grossProceedsAttorney: number // Box 10
+  section409ADeferrals: number // Box 12
+  excessGoldenParachute: number // Box 13
+  nonqualifiedDeferredComp: number // Box 14
+}
+
+// --- Form 1099-G (Government Payments) ---
+export interface F1099GData {
+  unemploymentCompensation: number // Box 1
+  stateLocalTaxRefund: number // Box 2
+  taxYear: number // Box 3 — tax year of refund
+  federalIncomeTaxWithheld: number // Box 4
+  rtaaPayments: number // Box 5
+  taxableGrants: number // Box 6
+  agriculturePayments: number // Box 7
+}
+
+// --- Schedule C (Profit or Loss from Business) ---
+export enum ScheduleCAccountingMethod {
+  Cash = 'Cash',
+  Accrual = 'Accrual',
+  Other = 'Other'
+}
+
+export interface ScheduleCData {
+  businessName: string
+  ein?: string
+  businessCode: string // NAICS code
+  accountingMethod: ScheduleCAccountingMethod
+  didMateriallyParticipate: boolean
+  didStartBusiness: boolean
+  didMakePaymentsRequiring1099: boolean
+  didFile1099s: boolean
+  personRole: PersonRole.PRIMARY | PersonRole.SPOUSE
+  // Income
+  grossReceipts: number // Line 1
+  returns: number // Line 2
+  costOfGoodsSold: number // Line 4 (from Part III)
+  otherIncome: number // Line 6
+  // Expenses (Part II)
+  advertising: number
+  carAndTruck: number
+  commissions: number
+  contractLabor: number
+  depletion: number
+  depreciation: number // Form 4562
+  employeeBenefits: number
+  insurance: number
+  interestMortgage: number
+  interestOther: number
+  legal: number
+  officeExpense: number
+  pensionProfitSharing: number
+  rentVehicles: number
+  rentOther: number
+  repairs: number
+  supplies: number
+  taxes: number
+  travel: number
+  meals: number
+  utilities: number
+  wages: number
+  otherExpenses: number
+  // Part III: Cost of Goods Sold
+  inventoryBeginning?: number
+  purchases?: number
+  laborCost?: number
+  materials?: number
+  otherCosts?: number
+  inventoryEnd?: number
+  // Part IV: Vehicle (simplified)
+  vehicleMiles?: number
+  businessMiles?: number
+  // Home office (from Form 8829)
+  homeOfficeDeduction?: number
+}
+
+// --- Form 8829 (Home Office Deduction) ---
+export interface Form8829Data {
+  totalAreaOfHome: number // Line 1
+  businessArea: number // Line 2
+  // Direct expenses
+  directMortgageInterest: number
+  directRealEstateTaxes: number
+  directInsurance: number
+  directRepairs: number
+  directUtilities: number
+  directOther: number
+  // Indirect expenses (allocated by business %)
+  indirectMortgageInterest: number
+  indirectRealEstateTaxes: number
+  indirectInsurance: number
+  indirectRepairs: number
+  indirectUtilities: number
+  indirectOther: number
+  // Depreciation
+  costOrBasisOfHome: number
+  costOfLand: number
+  datePlacedInService?: string
+}
+
+// --- Form 4562 (Depreciation and Amortization) ---
+export interface Section179Property {
+  description: string
+  cost: number
+  electedCost: number
+}
+
+export interface MACRSProperty {
+  classification: string // e.g. "3-year", "5-year", "7-year"
+  monthAndYearPlacedInService: string
+  basisForDepreciation: number
+  recoveryPeriod: string
+  convention: string
+  method: string
+  depreciationDeduction: number
+}
+
+export interface AmortizationCosts {
+  description: string
+  dateBegan: string
+  amortizableAmount: number
+  codeSection: string
+  amortizationPeriodOrPercentage: string
+  amortizationForThisYear: number
+}
+
+export interface Form4562Data {
+  businessOrActivityToWhichThisFormRelates: string
+  // Part I: Election To Expense Certain Property Under Section 179
+  maximumAmount?: number // Line 1
+  totalCostOfSection179Property?: number // Line 2
+  thresholdCost?: number // Line 3
+  section179Property?: Section179Property[] // Line 6
+  tentativeDeduction?: number // Line 9
+  carryoverOfDisallowedDeductionFromPriorYear?: number // Line 10
+  businessIncomeLimitation?: number // Line 11
+  // Part II: Special Depreciation Allowance and Other Depreciation
+  specialDepreciationAllowance?: number // Line 14
+  propertySubjectTo168f1?: number // Line 15
+  otherDepreciation?: number // Line 16
+  // Part III: MACRS Depreciation (Lines 17-19)
+  macrsDeductionsPriorYears?: number // Line 17
+  macrsProperty?: MACRSProperty[] // Line 19a-i
+  // Part IV: Summary
+  listedProperty?: number // Line 21
+  // Part VI: Amortization
+  amortizationCosts?: AmortizationCosts[] // Line 42
+}
+
+// --- Schedule F (Profit or Loss From Farming) ---
+export enum ScheduleFAccountingMethod {
+  Cash = 'Cash',
+  Accrual = 'Accrual'
+}
+
+// --- Form 2441 (Child and Dependent Care Expenses) ---
+export interface CareProvider {
+  name: string
+  address: string
+  tin: string // SSN or EIN
+  amountPaid: number
+}
+
+export interface QualifyingPerson2441 {
+  name: string
+  ssn: string
+  qualifyingExpenses: number
+}
+
+export interface Form2441Data {
+  careProviders: CareProvider[]
+  qualifyingPersons: QualifyingPerson2441[]
+  employerProvidedBenefits: number // W-2 box 10 (dependent care benefits)
+  personRole: PersonRole.PRIMARY | PersonRole.SPOUSE
+  priorYearCarryforward?: number
+}
+
+// --- Form 8863 (Education Credits) ---
+export interface Student8863 {
+  name: string
+  ssn: string
+  institutionName: string
+  institutionEIN: string
+  institutionAddress: string
+  qualifiedExpenses: number // Adjusted qualified expenses
+  wasAtLeastHalfTime: boolean
+  wasFirstFourYears: boolean // First 4 years of postsecondary education
+  hasCompletedFourYears: boolean // Already completed 4 years
+  hasBeenConvictedOfFelonyDrug: boolean
+  receivedAOTCPriorYears: number // Number of prior years AOTC claimed
+  isGraduateStudent: boolean
+  personRole: PersonRole.PRIMARY | PersonRole.SPOUSE | PersonRole.DEPENDENT
+}
+
+export interface Form8863Data {
+  students: Student8863[]
+}
+
+// --- Form 8606 (Nondeductible IRAs) ---
+export interface Form8606Data {
+  personRole: PersonRole.PRIMARY | PersonRole.SPOUSE
+  // Part I: Nondeductible Contributions
+  nondeductibleContributions: number // Line 1
+  totalBasisPriorYears: number // Line 2 — basis from prior years
+  // Part II: Conversions & Distributions
+  amountConverted: number // Line 8 — net amount converted to Roth
+  distributionsFromTraditional: number // Line 7
+  valueOfAllTraditionalIRAs: number // Line 6 — year-end value of all traditional IRAs
+  // Part III: Roth IRA Distributions
+  rothDistributions?: number // Line 19
+  rothContributionBasis?: number // Line 22 — basis in Roth contributions
+}
+
+// --- Form 1116 (Foreign Tax Credit) ---
+export enum ForeignIncomeCategory {
+  SectionA = 'A', // Section 951A (GILTI)
+  SectionB = 'B', // Foreign branch income
+  PassiveCategory = 'C', // Passive category income
+  GeneralCategory = 'D', // General category income
+  SectionE = 'E', // Section 901(j) income
+  CertainIncomeResourced = 'F' // Certain income re-sourced by treaty
+}
+
+export interface ForeignIncome1116 {
+  country: string
+  grossIncome: number
+  definitelyAllocableDeductions: number
+  apportionedShareDeductions: number
+  foreignTaxesPaidOrAccrued: number
+  taxType: 'paid' | 'accrued'
+  datesPaid?: string
+}
+
+export interface Form1116Data {
+  category: ForeignIncomeCategory
+  foreignIncomes: ForeignIncome1116[]
+  electionToClaimCredit: boolean // vs. itemized deduction
+  personRole: PersonRole.PRIMARY | PersonRole.SPOUSE
+}
+
+// --- Form 2210 (Underpayment of Estimated Tax) ---
+export interface Form2210Data {
+  priorYearTax: number // Prior year's total tax (line 9)
+  // Quarterly estimated payment dates and amounts
+  estimatedPayments: Array<{
+    datePaid: string
+    amount: number
+  }>
+  withholding: number
+  // For annualized income installment method (Schedule AI)
+  useAnnualizedMethod?: boolean
+  annualizedIncome?: [number, number, number, number] // income for each period
+}
+
+// --- Form 5695 (Residential Energy Credits) ---
+export interface Form5695Data {
+  // Part I: Residential Clean Energy Credit (Section 25D)
+  solarElectric: number // Line 1
+  solarWaterHeating: number // Line 2
+  fuelCell: number // Line 3
+  smallWindEnergy: number // Line 4
+  geothermalHeatPump: number // Line 5
+  batteryStorage: number // Line 6
+  // Part II: Energy Efficient Home Improvement Credit (Section 25C)
+  insulationMaterials: number // Line 13a
+  exteriorDoorsWindows: number // Line 13b
+  roofingSurfaces: number // Line 13c — reserved for future, currently 0
+  heatPumps: number // Line 14a
+  heatPumpWaterHeaters: number // Line 14b
+  biomassStoves: number // Line 14c
+  centralAC: number // Line 14d — reserved
+  naturalGasFurnace: number // Line 14e — reserved
+  panelboards: number // Line 14f — reserved
+  homeEnergyAudit: number // Line 15
+  priorYearCreditsUsed: number // To track lifetime limits
+}
+
+// --- Form 8880 (Saver's Credit) ---
+export interface Form8880Data {
+  // Contributions by taxpayer
+  primaryTraditionalIRA: number
+  primaryRothIRA: number
+  primaryEmployerPlan: number // 401k, 403b, 457b, TSP
+  primaryABLEAccount: number
+  // Contributions by spouse
+  spouseTraditionalIRA?: number
+  spouseRothIRA?: number
+  spouseEmployerPlan?: number
+  spouseABLEAccount?: number
+  // Distributions received in testing period
+  primaryDistributions: number
+  spouseDistributions?: number
+}
+
+// --- Schedule F (Profit or Loss from Farming) ---
+export interface ScheduleFData {
+  farmName: string
+  ein?: string
+  accountingMethod: 'Cash' | 'Accrual'
+  personRole: PersonRole.PRIMARY | PersonRole.SPOUSE
+  // Income
+  salesLivestock: number
+  costLivestock: number
+  cooperativeDistributions: number
+  agriculturePayments: number
+  cccLoans: number
+  cropInsurance: number
+  customHireIncome: number
+  otherFarmIncome: number
+  // Expenses
+  carAndTruck: number
+  chemicals: number
+  conservation: number
+  customHire: number
+  depreciation: number
+  employeeBenefits: number
+  feed: number
+  fertilizers: number
+  freight: number
+  fuel: number
+  insurance: number
+  interestMortgage: number
+  interestOther: number
+  labor: number
+  pensionProfitSharing: number
+  rentVehicles: number
+  rentOther: number
+  repairs: number
+  seeds: number
+  storage: number
+  supplies: number
+  taxes: number
+  utilities: number
+  veterinary: number
+  otherExpenses: number
+}
+
+// --- Form 2555 (Foreign Earned Income Exclusion) ---
+export interface Form2555Data {
+  foreignCountry: string
+  foreignAddress: string
+  employerName: string
+  employerAddress: string
+  employerIsForeign: boolean
+  qualifyingTest: 'bonafide' | 'physicalPresence'
+  // Bona fide residence
+  residenceStartDate?: string
+  residenceEndDate?: string
+  // Physical presence
+  physicalPresenceDays?: number // out of 330 days in 12-month period
+  presenceStartDate?: string
+  presenceEndDate?: string
+  // Income
+  foreignEarnedIncome: number
+  housingExpenses: number
+  employerProvidedHousing: number
+  personRole: PersonRole.PRIMARY | PersonRole.SPOUSE
+}
+
+// --- Form 8582 (Passive Activity Loss Limitations) ---
+export interface PassiveActivity {
+  name: string
+  currentYearIncome: number
+  currentYearLoss: number
+  priorYearUnallowedLoss: number
+  isRentalRealEstate: boolean
+  activeParticipation: boolean // for $25k special allowance
+}
+
+export interface Form8582Data {
+  activities: PassiveActivity[]
+  modifiedAGI?: number // for $25k special allowance phaseout
+}
+
+// --- Form 4797 (Sales of Business Property) ---
+export interface BusinessPropertySale {
+  description: string
+  dateAcquired: string
+  dateSold: string
+  grossSalesPrice: number
+  depreciationAllowed: number
+  cost: number
+  section1231: boolean
+  section1245: boolean
+  section1250: boolean
+}
+
+export interface Form4797Data {
+  sales: BusinessPropertySale[]
+}
+
+// --- Form 4952 (Investment Interest Expense Deduction) ---
+export interface Form4952Data {
+  investmentInterestExpense: number // Line 1
+  disallowedPriorYear: number // Line 2 — carryover from prior year
+  netInvestmentIncome: number // Line 4a
+  electToIncludeCapGains: boolean // Line 4e checkbox
+  electedCapGainsAmount?: number // Line 4e
+}
+
+// --- Form 8919 (Uncollected SS & Medicare Tax on Wages) ---
+export interface Employer8919 {
+  employerName: string
+  employerEIN: string
+  reasonCode: string // a-h
+  wages: number
+  federalIncomeTaxWithheld: number
+}
+
+export interface Form8919Data {
+  employers: Employer8919[]
+}
+
+// --- Form 4137 (SS & Medicare Tax on Unreported Tip Income) ---
+export interface Form4137Data {
+  employerAllocatedTips: number // Line 1
+  tipsReportedToEmployer: number // Line 2
+}
+
+// --- Form 8283 (Noncash Charitable Contributions) ---
+export interface NoncashContribution {
+  doneeOrganization: string
+  doneeAddress: string
+  description: string
+  dateOfContribution: string
+  dateAcquired: string
+  howAcquired: string
+  donorCost: number
+  fairMarketValue: number
+  methodOfFMV: string
+}
+
+export interface NoncashContributionSectionB {
+  doneeOrganization: string
+  doneeAddress: string
+  description: string
+  condition: string // physical condition of property
+  dateAcquired: string
+  dateOfContribution: string
+  howAcquired: string
+  donorCost: number
+  fairMarketValue: number
+  appraiserName: string
+  appraiserTIN: string
+  appraisalDate: string
+}
+
+export interface Form8283Data {
+  contributions: NoncashContribution[]
+  contributionsSectionB?: NoncashContributionSectionB[]
+}
+
+// --- Form 8962 (Premium Tax Credit) ---
+export interface MarketplacePolicy {
+  marketplaceId: string // Line 11 — Marketplace identifier
+  policyNumber: string
+  startMonth: number
+  endMonth: number
+  annualPremium: number
+  annualSLCSP: number // Second Lowest Cost Silver Plan
+  advancePayments: number // Advance PTC received
+}
+
+export interface Form8962Data {
+  policies: MarketplacePolicy[]
+  familySize: number
+  annualHouseholdIncome: number
+  federalPovertyLine: number
+  isSharedPolicy: boolean
+  sharedPolicyAllocationPercentage?: number
+}
+
+// --- Schedule R (Credit for the Elderly or the Disabled) ---
+export interface ScheduleRData {
+  // Filing status box (1-9) — determines initial amount
+  filingStatusBox: number
+  // Nontaxable social security/railroad retirement benefits
+  nontaxableSocialSecurity: number
+  // Nontaxable pensions/annuities/disability income
+  nontaxablePensions: number
+  // Disability income (if under 65, retired on permanent/total disability)
+  disabilityIncome?: number
+}
+
+// --- Form 8814 (Parents' Election for Child's Interest/Dividends) ---
+export interface Form8814Data {
+  childName: string
+  childSSN: string
+  interestIncome: number // Line 1a
+  ordinaryDividends: number // Line 2a
+  capitalGainDistributions: number // Line 3
+  qualifiedDividendsIncluded?: number // Qualified dividends from child's 1099-DIV
+  taxExemptInterest?: number // Line 1b: Tax-exempt interest
+}
+
+// --- Schedule 1-A (Additional Deductions — TY2026+) ---
+export interface Schedule1AData {
+  // Part II: No Tax on Tips
+  qualifiedTipsW2?: number // Line 4a: qualified tips on W-2 box 7
+  qualifiedTipsF4137?: number // Line 4b: qualified tips on Form 4137
+  qualifiedTipsSelfEmployed?: number // Line 5: qualified tips from 1099-NEC/MISC
+  // Part III: No Tax on Overtime
+  qualifiedOvertimeW2?: number // Line 14a: qualified overtime from W-2
+  qualifiedOvertime1099?: number // Line 14b: qualified overtime from 1099-NEC/MISC
+  // Part IV: No Tax on Car Loan Interest
+  vehicleInterest?: Array<{
+    vin: string
+    interestDeductedOnSchedule: number // (ii) already deducted on C/E/F
+    interestForSchedule1A: number // (iii) Schedule 1-A deduction
+  }>
+  // Part V: Enhanced Deduction for Seniors
+  primaryBornBefore1962?: boolean // born before Jan 2, 1962
+  spouseBornBefore1962?: boolean // spouse born before Jan 2, 1962
+}
+
+// --- Form 8801 (Credit for Prior Year Minimum Tax) ---
+export interface Form8801Data {
+  // Prior year Form 6251 amounts
+  priorYearAMTI: number // Line 1: Prior year AMTI (Form 6251 line 1 + 2e combined)
+  exclusionItems: number // Line 2: Adjustments treated as exclusion items
+  mtcNOLDeduction?: number // Line 3: Minimum tax credit NOL deduction
+  // Line 10: Prior year regular tax minus credits
+  priorYearRegularTaxMinusCredits: number
+  // AMT credit carryforward from prior year
+  priorYearAMTCreditCarryforward?: number
+}
+
 export interface Information<D = Date> {
   f1099s: Supported1099[]
   w2s: IncomeW2[]
@@ -575,6 +1154,55 @@ export interface Information<D = Date> {
   stateResidencies: StateResidency[]
   healthSavingsAccounts: HealthSavingsAccount<D>[]
   individualRetirementArrangements: Ira[]
+  // --- New data types for extended form coverage ---
+  scheduleCBusinesses?: ScheduleCData[]
+  f1099necs?: Array<Income1099<'NEC', F1099NECData>>
+  f1099miscs?: Array<Income1099<'MISC', F1099MISCData>>
+  f1099gs?: Array<Income1099<'G', F1099GData>>
+  form1116s?: Form1116Data[]
+  form8606s?: Form8606Data[]
+  form8829s?: Form8829Data[]
+  form8863?: Form8863Data
+  form2441?: Form2441Data
+  form2210?: Form2210Data
+  form5695?: Form5695Data
+  form8880?: Form8880Data
+  form4562s?: Form4562Data[]
+  scheduleFData?: ScheduleFData[]
+  form2555s?: Form2555Data[]
+  form8582?: Form8582Data
+  form4797?: Form4797Data
+  form4952?: Form4952Data
+  form8919?: Form8919Data
+  form4137?: Form4137Data
+  form8283?: Form8283Data
+  form8962?: Form8962Data
+  form8814s?: Form8814Data[]
+  scheduleRData?: ScheduleRData
+  form8801?: Form8801Data
+  schedule1AData?: Schedule1AData
+  // --- Additional Schedule 1 data ---
+  educatorExpenses?: number // Schedule 1, line 11 (max $300)
+  selfEmploymentRetirementContributions?: number // Schedule 1, line 16 (SEP/SIMPLE/qualified plans)
+  selfEmploymentHealthInsurance?: number // Schedule 1, line 17
+  iraDeduction?: number // Schedule 1, line 19a (from IRA Deduction Worksheet)
+  extensionPaymentAmount?: number // Schedule 3, line 10
+  // --- Additional income items (Schedule 1, Part I) ---
+  gamblingIncome?: number // Schedule 1, line 8a (prizes, awards, gambling)
+  cancellationOfDebtIncome?: number // Schedule 1, line 8c
+  scholarshipIncome?: number // Schedule 1, line 8q
+  section529Distributions?: number // Schedule 1, line 8p
+  // --- F1040 line 1 additional income items ---
+  householdEmployeeIncome?: number // F1040, line 1b
+  medicaidWaiverPayments?: number // F1040, line 1d (excluded from income)
+  strikeBenefits?: number // F1040, line 1h
+  stockOptionIncome?: number // F1040, line 1i
+  // --- Schedule D capital loss carryover ---
+  shortTermCapitalLossCarryover?: number // Schedule D, line 6 (from prior year)
+  longTermCapitalLossCarryover?: number // Schedule D, line 14 (from prior year)
+  // --- RRTA (Railroad Retirement) ---
+  rrtaCompensation?: number // Tier 1 RRTA compensation for F8959
+  rrtaTax?: number // Tier 1 RRTA tax withheld
 }
 
 export type InformationDateString = Information<string>

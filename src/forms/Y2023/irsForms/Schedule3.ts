@@ -51,13 +51,18 @@ export default class Schedule3 extends F1040Attachment {
 
   deductions = (): number => 0
   // Part I: Nonrefundable credits
-  l1 = (): number | undefined => undefined
+  l1 = (): number | undefined => {
+    if (this.f1040.f1116s && this.f1040.f1116s.length > 0) {
+      return sumFields(this.f1040.f1116s.map(f => f.l35()))
+    }
+    return undefined
+  }
   l2 = (): number | undefined => undefined
   l3 = (): number | undefined => this.f1040.f8863?.l19()
-  l4 = (): number | undefined => undefined
+  l4 = (): number | undefined => this.f1040.f8880?.l13()
   l5 = (): number | undefined => undefined
   l6a = (): number | undefined => undefined // TODO: other credits
-  l6b = (): number | undefined => undefined // TODO: other credits
+  l6b = (): number | undefined => this.f1040.f8801?.credit() // Form 8801
   l6c = (): number | undefined => undefined // TODO: other credits
   l6d = (): number | undefined => undefined // TODO: other credits
   l6e = (): number | undefined => undefined // TODO: other credits

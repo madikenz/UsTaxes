@@ -33,3 +33,9 @@ yarn-error.log*
 
 /logs/
 /src/core/data/validate-fns.js
+.claude/
+nul
+dist-server/
+temp_xls/
+tsc_*.txt
+1040_calculator.*

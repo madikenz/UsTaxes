@@ -3,6 +3,7 @@ import { FormTag } from 'ustaxes/core/irsForms/Form'
 import { sumFields } from 'ustaxes/core/irsForms/util'
 import F1040 from './F1040'
 import { Field } from 'ustaxes/core/pdfFiller'
+import ScheduleF from './ScheduleF'
 
 export default class Schedule1 extends F1040Attachment {
   tag: FormTag = 'f1040s1'
@@ -28,7 +29,12 @@ export default class Schedule1 extends F1040Attachment {
   l3 = (): number | undefined => undefined
   l4 = (): number | undefined => undefined
   l5 = (): number | undefined => this.f1040.scheduleE.l41()
-  l6 = (): number | undefined => undefined
+  l6 = (): number | undefined => {
+    if (this.f1040.scheduleF !== undefined && this.f1040.scheduleF.length > 0) {
+      return sumFields(this.f1040.scheduleF.map((f: ScheduleF) => f.l34()))
+    }
+    return undefined
+  }
   l7 = (): number | undefined => undefined
   l8a = (): number | undefined => undefined
   l8b = (): number | undefined => undefined

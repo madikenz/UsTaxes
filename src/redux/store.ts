@@ -2,7 +2,8 @@ import {
   createStore as reduxCreateStore,
   applyMiddleware,
   Store,
-  CombinedState
+  CombinedState,
+  Middleware
 } from 'redux'
 import logger from 'redux-logger'
 import rootReducer from './reducer'
@@ -160,7 +161,7 @@ export const createStoreUnpersisted = (information: Information): InfoStore =>
   })
 
 export const createStore = (): PersistedStore =>
-  reduxCreateStore(persistedReducer, applyMiddleware(logger))
+  reduxCreateStore(persistedReducer, applyMiddleware(logger as Middleware))
 
 export const store = createStore()
 

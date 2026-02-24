@@ -413,6 +413,13 @@ const formReducer = (
       }
     }
 
+    case ActionName.SET_EXTENDED_FORM_DATA: {
+      return {
+        ...newState,
+        ...action.formData
+      }
+    }
+
     default: {
       return newState
     }
@@ -487,6 +494,8 @@ const rootReducer: Reducer<
   Y2022: guardByYear('Y2022'),
   Y2023: guardByYear('Y2023'),
   Y2024: guardByYear('Y2024'),
+  Y2025: guardByYear('Y2025'),
+  Y2026: guardByYear('Y2026'),
   activeYear
 }) as Reducer<CombinedState<YearsTaxesState>, Actions>
 

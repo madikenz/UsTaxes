@@ -1,0 +1,50 @@
+# Stage 1: Build the TypeScript server
+FROM node:20-slim AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install all dependencies (including dev for building)
+# --ignore-scripts: skip prepare script (husky/env.ts not needed in Docker)
+RUN npm ci --ignore-scripts
+
+# Copy source code
+COPY tsconfig.path.json tsconfig.server.json ./
+COPY src/ src/
+COPY server/ server/
+
+# Build the server
+RUN npx tsc -p tsconfig.server.json && \
+    npx tsc-alias -p tsconfig.server.json
+
+# Stage 2: Production image
+FROM node:20-slim AS production
+
+WORKDIR /app
+
+# Copy package files and install production deps only
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts && \
+    npm install express --ignore-scripts && \
+    npm cache clean --force
+
+# Copy compiled server code
+COPY --from=builder /app/dist-server/ ./dist-server/
+
+# Copy IRS PDF form templates
+COPY public/forms/ ./forms/
+
+# Set forms directory for the PDF downloader
+ENV FORMS_DIR=/app/forms
+ENV PORT=3001
+ENV NODE_ENV=production
+
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "fetch('http://localhost:3001/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
+
+CMD ["node", "dist-server/server/index.js"]

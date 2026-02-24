@@ -94,7 +94,8 @@ export enum ActionName {
   REMOVE_SCHEDULE_K1_F1065 = 'SCHEDULE_K1_F1065/REMOVE',
   ADD_CREDIT = 'CREDIT/ADD',
   EDIT_CREDIT = 'CREDIT/EDIT',
-  REMOVE_CREDIT = 'CREDIT/REMOVE'
+  REMOVE_CREDIT = 'CREDIT/REMOVE',
+  SET_EXTENDED_FORM_DATA = 'SET_EXTENDED_FORM_DATA'
 }
 
 interface Save<T, R> {
@@ -179,6 +180,10 @@ type RemoveScheduleK1Form1065 = Save<
 type AddCredit = Save<typeof ActionName.ADD_CREDIT, Credit>
 type EditCredit = Save<typeof ActionName.EDIT_CREDIT, EditCreditAction>
 type RemoveCredit = Save<typeof ActionName.REMOVE_CREDIT, number>
+type SetExtendedFormData = Save<
+  typeof ActionName.SET_EXTENDED_FORM_DATA,
+  Partial<Information>
+>
 
 export type Actions =
   | SaveRefundInfo
@@ -230,6 +235,7 @@ export type Actions =
   | AddCredit
   | EditCredit
   | RemoveCredit
+  | SetExtendedFormData
 
 export type SignalAction = (year: TaxYear) => Actions
 export type ActionCreator<A> = (formData: A) => SignalAction
@@ -523,3 +529,15 @@ export const removeCredit: ActionCreator<number> = makeActionCreator(
   ActionName.REMOVE_CREDIT,
   indexValidator
 )
+
+/**
+ * Generic action for setting extended form data fields on Information.
+ * Accepts a Partial<Information> containing any extended form fields
+ * (scheduleCBusinesses, form2441, form8863, form5695, etc.)
+ *
+ * Usage:
+ *   dispatch(setExtendedFormData({ form2441: myData })(activeYear))
+ *   dispatch(setExtendedFormData({ scheduleCBusinesses: [biz1, biz2] })(activeYear))
+ */
+export const setExtendedFormData: ActionCreator<Partial<Information>> =
+  makeActionCreator(ActionName.SET_EXTENDED_FORM_DATA)

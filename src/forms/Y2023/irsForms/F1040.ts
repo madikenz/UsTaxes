@@ -11,6 +11,14 @@ import federalBrackets, { CURRENT_YEAR } from '../data/federal'
 import F4972 from './F4972'
 import F5695 from './F5695'
 import F8814 from './F8814'
+import F8829 from './F8829'
+import F1116 from './F1116'
+import F2210 from './F2210'
+import F4562 from './F4562'
+import F8283 from './F8283'
+import F8606 from './F8606'
+import F8801 from './F8801'
+import F8880 from './F8880'
 import F8888 from './F8888'
 import F8889 from './F8889'
 import F8910 from './F8910'
@@ -25,6 +33,7 @@ import Schedule8812 from './Schedule8812'
 import ScheduleA from './ScheduleA'
 import ScheduleD from './ScheduleD'
 import ScheduleE from './ScheduleE'
+import ScheduleF from './ScheduleF'
 import ScheduleSE from './ScheduleSE'
 import ScheduleEIC from './ScheduleEIC'
 import ScheduleR from './ScheduleR'
@@ -73,6 +82,7 @@ export default class F1040 extends F1040Base {
   scheduleC?: ScheduleC
   scheduleD: ScheduleD
   scheduleE: ScheduleE
+  scheduleF?: ScheduleF[]
   scheduleSE: ScheduleSE
   scheduleEIC: ScheduleEIC
   scheduleR?: ScheduleR
@@ -82,13 +92,21 @@ export default class F1040 extends F1040Base {
   f2555?: F2555
   f4136?: F4136
   f4137?: F4137
+  f4562s?: F4562[]
   f4563?: F4563
   f4797?: F4797
   f4952?: F4952
   f4972?: F4972
   f5695?: F5695
   f6251: F6251
+  f1116s?: F1116[]
+  f2210?: F2210
+  f8283?: F8283
+  f8606s?: F8606[]
+  f8801?: F8801
+  f8880?: F8880
   f8814?: F8814
+  f8829s?: F8829[]
   f8582?: F8582
   f8853?: F8853
   f8863?: F8863
@@ -119,6 +137,9 @@ export default class F1040 extends F1040Base {
     this.scheduleB = new ScheduleB(this)
     this.scheduleD = new ScheduleD(this)
     this.scheduleE = new ScheduleE(this)
+    if (this.info.scheduleFData && this.info.scheduleFData.length > 0) {
+      this.scheduleF = this.info.scheduleFData.map(data => new ScheduleF(this, data))
+    }
     this.scheduleEIC = new ScheduleEIC(this)
     this.scheduleSE = new ScheduleSE(this)
 
@@ -134,6 +155,38 @@ export default class F1040 extends F1040Base {
     // add in separate form 8889 for the spouse
     if (this.info.taxPayer.spouse) {
       this.f8889Spouse = new F8889(this, this.info.taxPayer.spouse)
+    }
+
+    if (this.info.form8829s && this.info.form8829s.length > 0) {
+      this.f8829s = this.info.form8829s.map(data => new F8829(this, data))
+    }
+
+    if (this.info.form4562s && this.info.form4562s.length > 0) {
+      this.f4562s = this.info.form4562s.map(data => new F4562(this, data))
+    }
+
+    if (this.info.form1116s && this.info.form1116s.length > 0) {
+      this.f1116s = this.info.form1116s.map(data => new F1116(this, data))
+    }
+
+    if (this.info.form2210) {
+      this.f2210 = new F2210(this, this.info.form2210)
+    }
+
+    if (this.info.form8283) {
+      this.f8283 = new F8283(this, this.info.form8283)
+    }
+
+    if (this.info.form8606s && this.info.form8606s.length > 0) {
+      this.f8606s = this.info.form8606s.map(data => new F8606(this, data))
+    }
+
+    if (this.info.form8801) {
+      this.f8801 = new F8801(this, this.info.form8801)
+    }
+
+    if (this.info.form8880) {
+      this.f8880 = new F8880(this, this.info.form8880)
     }
 
     this.f8959 = new F8959(this)
@@ -190,16 +243,25 @@ export default class F1040 extends F1040Base {
       this.scheduleB,
       this.scheduleD,
       this.scheduleE,
+      ...(this.scheduleF ?? []),
       this.scheduleSE,
       this.scheduleR,
       this.scheduleEIC,
       this.schedule8812,
+      ...(this.f4562s ?? []),
       this.f4797,
       this.f4952,
       this.f4972,
       this.f5695,
       this.f6251,
+      ...(this.f1116s ?? []),
+      this.f2210,
+      this.f8283,
+      ...(this.f8606s ?? []),
+      this.f8801,
+      this.f8880,
       this.f8814,
+      ...(this.f8829s ?? []),
       this.f8888,
       this.f8889,
       this.f8889Spouse,
@@ -343,7 +405,13 @@ export default class F1040 extends F1040Base {
   // This is the value of box 1 in 1099-R forms coming from IRAs
   l4a = (): number | undefined => this.totalGrossDistributionsFromIra()
   // This should be the value of box 2a in 1099-R coming from IRAs
-  l4b = (): number | undefined => this.totalTaxableFromIra()
+  // Incorporates Form 8606 taxable amounts if present
+  l4b = (): number | undefined => {
+    if (this.f8606s && this.f8606s.length > 0) {
+      return sumFields(this.f8606s.map(f => f.totalTaxable()))
+    }
+    return this.totalTaxableFromIra()
+  }
   // This is the value of box 1 in 1099-R forms coming from pensions/annuities
   l5a = (): number | undefined =>
     this.totalGrossDistributionsFrom1099R(PlanType1099.Pension)
@@ -483,8 +551,8 @@ export default class F1040 extends F1040Base {
 
   l37 = (): number => Math.max(0, this.l24() - this.l33())
 
-  // TODO - estimated tax penalty
-  l38 = (): number | undefined => undefined
+  // Estimated tax penalty
+  l38 = (): number | undefined => this.f2210?.l14()
 
   _depField = (idx: number): string | boolean => {
     const deps: Dependent[] = this.info.taxPayer.dependents

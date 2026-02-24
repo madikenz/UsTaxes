@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.path.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": ["ES2020", "DOM"],
+    "outDir": "./dist-server",
+    "rootDir": ".",
+    "allowJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": false,
+    "noEmit": false
+  },
+  "include": [
+    "server/**/*",
+    "src/core/**/*",
+    "src/forms/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/components/**",
+    "src/redux/**",
+    "src/**/*.test.*"
+  ]
+}

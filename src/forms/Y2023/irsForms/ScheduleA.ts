@@ -100,8 +100,7 @@ export default class ScheduleA extends F1040Attachment {
 
   l11 = (): number => Number(this.itemizedDeductions.charityCashCheck)
 
-  // TODO: form 8283
-  l12 = (): number => Number(this.itemizedDeductions.charityOther)
+  l12 = (): number => Number(this.itemizedDeductions.charityOther) + (this.f1040.f8283?.totalContributions() ?? 0)
   l13 = (): number => 0
   l14 = (): number => this.l11() + this.l12() + this.l13()
 

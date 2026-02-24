@@ -57,6 +57,10 @@ export function fillPDF(
       }
     } else if (pdfField instanceof PDFTextField) {
       try {
+        // Remove maxLength constraint that some IRS XFA-based forms set,
+        // which causes setText() to throw after pdf-lib strips XFA data.
+        pdfField.setMaxLength(undefined)
+
         const showValue =
           !isNaN(value as number) &&
           value &&
@@ -65,7 +69,11 @@ export function fillPDF(
             : value?.toString()
         pdfField.setText(showValue)
       } catch (err) {
-        throw error('text field')
+        // Some IRS PDF fields fail after XFA stripping. Warn and continue
+        // so the rest of the PDF still generates.
+        console.warn(
+          `${formName} Field ${index} (${pdfField.getName()}): skipped – ${err instanceof Error ? err.message : err}`
+        )
       }
     } else if (value !== undefined) {
       throw error('unknown')

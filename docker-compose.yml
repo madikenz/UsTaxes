@@ -6,3 +6,14 @@ services:
     command: npm run start
     ports:
       - '3000:3000'
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - '3001:3001'
+    environment:
+      - PORT=3001
+      - FORMS_DIR=/app/forms
+    restart: unless-stopped
