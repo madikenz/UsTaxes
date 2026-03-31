@@ -34,19 +34,19 @@ const federalBrackets: FederalBrackets = {
     rates: [10, 12, 22, 24, 32, 35, 37],
     status: {
       [FilingStatus.S]: {
-        brackets: [11925, 48475, 103350, 197300, 250525, 626350],
+        brackets: [11925, 48475, 103350, 191950, 243725, 609350],
         deductions: [
           {
             name: 'Standard Deduction (Single)',
-            amount: 15000
+            amount: 15750
           },
           {
             name: 'Standard Deduction (Single) with 1 age or blindness allowance',
-            amount: 17000
+            amount: 17750
           },
           {
             name: 'Standard Deduction (Single) with 2 age or blindness allowances',
-            amount: 19000
+            amount: 19750
           }
         ],
         exemptions: [
@@ -57,27 +57,27 @@ const federalBrackets: FederalBrackets = {
         ]
       },
       [FilingStatus.MFJ]: {
-        brackets: [23850, 96950, 206700, 394600, 501050, 751600],
+        brackets: [23850, 96950, 206700, 383900, 487450, 731200],
         deductions: [
           {
             name: 'Standard Deduction (Married)',
-            amount: 30000
+            amount: 31500
           },
           {
             name: 'Standard Deduction (Married) with 1 age or blindness allowance',
-            amount: 31600
+            amount: 33100
           },
           {
             name: 'Standard Deduction (Married) with 2 age or blindness allowances',
-            amount: 33200
+            amount: 34700
           },
           {
             name: 'Standard Deduction (Married) with 3 age or blindness allowances',
-            amount: 34800
+            amount: 36300
           },
           {
             name: 'Standard Deduction (Married) with 4 age or blindness allowances',
-            amount: 36400
+            amount: 37900
           }
         ],
         exemptions: [
@@ -88,11 +88,11 @@ const federalBrackets: FederalBrackets = {
         ]
       },
       [FilingStatus.W]: {
-        brackets: [23850, 96950, 206700, 394600, 501050, 751600],
+        brackets: [23850, 96950, 206700, 383900, 487450, 731200],
         deductions: [
           {
             name: 'Standard Deduction (Widowed)',
-            amount: 30000
+            amount: 31500
           },
           {
             name: 'Standard Deduction (Widowed) with 1 age or blindness allowance',
@@ -111,11 +111,11 @@ const federalBrackets: FederalBrackets = {
         ]
       },
       [FilingStatus.MFS]: {
-        brackets: [11925, 48475, 103350, 197300, 250525, 375800],
+        brackets: [11925, 48475, 103350, 191950, 243725, 365600],
         deductions: [
           {
             name: 'Standard Deduction (Married Filing Separately)',
-            amount: 15000
+            amount: 15750
           },
           {
             name: 'Standard Deduction (Married Filing Separately) with 1 age or blindness allowance',
