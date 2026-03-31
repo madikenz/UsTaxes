@@ -231,6 +231,11 @@ export default class Schedule2 extends F1040Attachment {
     this.l18(),
     undefined, //this.l19(),
     this.l20(),
-    this.l21()
+    this.l21(),
+    // 2025: 4 new fields at end (lines 22-25 or reserved)
+    undefined,                     // [59] f2_21
+    undefined,                     // [60] f2_22
+    undefined,                     // [61] f2_23
+    undefined                      // [62] f2_24
   ]
 }

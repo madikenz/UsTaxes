@@ -131,43 +131,40 @@ export default class ScheduleA extends F1040Attachment {
 
   l18 = (): boolean => false
 
+  // 2025 Schedule A — 33 fields (was 37 in 2024: removed l16 detail fields)
   fields = (): Field[] => [
-    this.f1040.namesString(),
-    this.f1040.info.taxPayer.primaryPerson.ssid,
-    this.l1(),
-    this.l2(),
-    this.l3(),
-    this.l4(),
-    this.l5aSalesTax(),
-    this.l5a(),
-    this.l5b(),
-    this.l5c(),
-    this.l5d(),
-    this.l5e(),
-    this.l6OtherTaxesTypeAndAmount1(),
-    this.l6OtherTaxesTypeAndAmount2(),
-    this.l6(),
-    this.l7(),
-    this.l8AllMortgageLoan(),
-    this.l8a(),
-    this.l8bUnreportedInterest1(),
-    this.l8bUnreportedInterest2(),
-    this.l8b(),
-    this.l8c(),
-    this.l8d(), // Reserved for future use
-    this.l8e(),
-    this.l9(),
-    this.l10(),
-    this.l11(),
-    this.l12(),
-    this.l13(),
-    this.l14(),
-    this.l15(),
-    this.l16Other1(),
-    this.l16Other2(),
-    this.l16Other3(),
-    this.l16(),
-    this.l17(),
-    this.l18()
+    this.f1040.namesString(),                    // [ 0] f1_1  name
+    this.f1040.info.taxPayer.primaryPerson.ssid,  // [ 1] f1_2  SSN
+    this.l1(),                                    // [ 2] f1_3  medical
+    this.l2(),                                    // [ 3] f1_4  AGI × 7.5%
+    this.l3(),                                    // [ 4] f1_5  medical deduction
+    this.l4(),                                    // [ 5] f1_6  line 4
+    this.l5aSalesTax(),                           // [ 6] c1_1  sales tax checkbox
+    this.l5a(),                                   // [ 7] f1_7  state/local tax
+    this.l5b(),                                   // [ 8] f1_8  real estate tax
+    this.l5c(),                                   // [ 9] f1_9  property tax
+    this.l5d(),                                   // [10] f1_10 total 5a-5c
+    this.l5e(),                                   // [11] f1_11 SALT (capped)
+    this.l6OtherTaxesTypeAndAmount1(),            // [12] f1_12 other taxes desc 1
+    this.l6OtherTaxesTypeAndAmount2(),            // [13] f1_13 other taxes desc 2
+    this.l6(),                                    // [14] f1_14 other taxes amount
+    this.l7(),                                    // [15] c1_2  interest checkbox (all/not all)
+    this.l8a(),                                   // [16] f1_15 mortgage interest 1098
+    this.l8bUnreportedInterest1(),                // [17] f1_16 mortgage not on 1098
+    this.l8b(),                                   // [18] f1_17 line 8b
+    this.l8c(),                                   // [19] f1_18 points
+    this.l8d(),                                   // [20] f1_19 mortgage insurance
+    this.l8e(),                                   // [21] f1_20 interest total
+    this.l9(),                                    // [22] f1_21 investment interest
+    this.l10(),                                   // [23] f1_22 charity cash
+    this.l11(),                                   // [24] f1_23 charity other
+    this.l12(),                                   // [25] f1_24 charity carryover
+    this.l13(),                                   // [26] f1_25 charity total
+    this.l14(),                                   // [27] f1_26 casualty/theft
+    this.l15(),                                   // [28] f1_27 other deductions
+    this.l16(),                                   // [29] f1_28 total other
+    this.l17(),                                   // [30] f1_29 total itemized
+    this.l18(),                                   // [31] f1_30 std deduction comparison
+    this.l17() > (this.f1040.standardDeduction() ?? 0), // [32] c1_3 itemize checkbox
   ]
 }

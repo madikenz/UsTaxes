@@ -152,6 +152,11 @@ export default class ScheduleSE extends F1040Attachment {
     this.l10(),
     this.l11(),
     this.l12(),
-    this.l13()
+    this.l13(),
+    // 2025: 4 new fields on page 2
+    undefined,                     // [23] f2_1
+    undefined,                     // [24] f2_2
+    undefined,                     // [25] f2_3
+    undefined                      // [26] f2_4
   ]
 }

@@ -198,18 +198,15 @@ export default class Schedule3 extends F1040Attachment {
     this.l11(),
     this.l12(),
 
-    this.l13a(),
-    this.l13b(),
-    //this.l13c(),  // this field is left for future use and is not fillable
-    this.l13d(),
-    //this.l13e(),  // this field is left for future use and is not fillable
-    this.l13f(),
-    //this.l13g(),  // this field is left for future use and is not fillable
-    this.l13h(),
-    this.l13zDesc1(),
-    this.l13zDesc2(),
-    this.l13z(),
-    this.l14(),
-    this.l15()
+    // 2025: consolidated Section 13 — fewer detail fields
+    this.l13a(),                   // [28] f1_29 line 13a
+    this.l13b(),                   // [29] f1_30 line 13b
+    this.l13d(),                   // [30] f1_31 line 13d
+    this.l13f(),                   // [31] f1_32 line 13f
+    this.l13h(),                   // [32] f1_33 line 13h
+    this.l13zDesc1(),              // [33] f1_34 line 13z desc
+    this.l13z(),                   // [34] f1_35 line 13z amount
+    this.l14(),                    // [35] f1_36 line 14
+    this.l15()                     // [36] f1_37 line 15
   ]
 }
