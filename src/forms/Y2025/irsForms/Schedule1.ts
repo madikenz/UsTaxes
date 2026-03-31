@@ -309,7 +309,6 @@ export default class Schedule1 extends F1040Attachment {
     this.l24k(),                                        // 69: f2_27 line 24k
     this.l24zDesc(),                                    // 70: f2_28 line 24z desc
     this.l24z(),                                        // 71: f2_29 line 24z amount
-    this.l25(),                                         // 72: f2_30 line 25 (subtotal 24a-24z)
-    this.l26()                                          // 73: f2_31 line 26 (total)
+    this.l25(),                                         // 72: f2_30 line 25
   ]
 }
