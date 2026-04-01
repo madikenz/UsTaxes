@@ -1,0 +1,324 @@
+{
+  "form": "f1040s2",
+  "year": 2025,
+  "template": "f1040s2.pdf",
+  "totalFields": 63,
+  "generated": "2026-04-01T00:59:43.532Z",
+  "fields": {
+    "f1_01": {
+      "index": 0,
+      "type": "text",
+      "name": "Page1.f1_01"
+    },
+    "f1_02": {
+      "index": 1,
+      "type": "text",
+      "name": "Page1.f1_02"
+    },
+    "f1_03": {
+      "index": 2,
+      "type": "text",
+      "name": "Page1.Line1a_ReadOrder.f1_03"
+    },
+    "f1_04": {
+      "index": 3,
+      "type": "text",
+      "name": "Page1.f1_04"
+    },
+    "f1_05": {
+      "index": 4,
+      "type": "text",
+      "name": "Page1.f1_05"
+    },
+    "f1_06": {
+      "index": 5,
+      "type": "text",
+      "name": "Page1.f1_06"
+    },
+    "c1_1": {
+      "index": 6,
+      "type": "checkbox",
+      "name": "Page1.Line1e_ReadOrder.c1_1"
+    },
+    "c1_1[1]": {
+      "index": 7,
+      "type": "checkbox",
+      "name": "Page1.Line1e_ReadOrder.c1_1[1]"
+    },
+    "c1_1[2]": {
+      "index": 8,
+      "type": "checkbox",
+      "name": "Page1.Line1e_ReadOrder.c1_1[2]"
+    },
+    "c1_1[3]": {
+      "index": 9,
+      "type": "checkbox",
+      "name": "Page1.Line1e_ReadOrder.c1_1[3]"
+    },
+    "f1_07": {
+      "index": 10,
+      "type": "text",
+      "name": "Page1.f1_07"
+    },
+    "c1_2": {
+      "index": 11,
+      "type": "checkbox",
+      "name": "Page1.Line1f_ReadOrder.c1_2"
+    },
+    "c1_2[1]": {
+      "index": 12,
+      "type": "checkbox",
+      "name": "Page1.Line1f_ReadOrder.c1_2[1]"
+    },
+    "c1_2[2]": {
+      "index": 13,
+      "type": "checkbox",
+      "name": "Page1.Line1f_ReadOrder.c1_2[2]"
+    },
+    "c1_2[3]": {
+      "index": 14,
+      "type": "checkbox",
+      "name": "Page1.Line1f_ReadOrder.c1_2[3]"
+    },
+    "f1_08": {
+      "index": 15,
+      "type": "text",
+      "name": "Page1.f1_08"
+    },
+    "f1_09": {
+      "index": 16,
+      "type": "text",
+      "name": "Page1.f1_09"
+    },
+    "f1_10": {
+      "index": 17,
+      "type": "text",
+      "name": "Page1.f1_10"
+    },
+    "f1_11": {
+      "index": 18,
+      "type": "text",
+      "name": "Page1.f1_11"
+    },
+    "f1_12": {
+      "index": 19,
+      "type": "text",
+      "name": "Page1.f1_12"
+    },
+    "f1_13": {
+      "index": 20,
+      "type": "text",
+      "name": "Page1.f1_13"
+    },
+    "c1_3": {
+      "index": 21,
+      "type": "checkbox",
+      "name": "Page1.Line4_ReadOrder.c1_3"
+    },
+    "c1_4": {
+      "index": 22,
+      "type": "checkbox",
+      "name": "Page1.Line4_ReadOrder.c1_4"
+    },
+    "c1_5": {
+      "index": 23,
+      "type": "checkbox",
+      "name": "Page1.Line4_ReadOrder.c1_5"
+    },
+    "f1_14": {
+      "index": 24,
+      "type": "text",
+      "name": "Page1.Line4_ReadOrder.f1_14"
+    },
+    "f1_15": {
+      "index": 25,
+      "type": "text",
+      "name": "Page1.f1_15"
+    },
+    "f1_16": {
+      "index": 26,
+      "type": "text",
+      "name": "Page1.f1_16"
+    },
+    "f1_17": {
+      "index": 27,
+      "type": "text",
+      "name": "Page1.f1_17"
+    },
+    "f1_18": {
+      "index": 28,
+      "type": "text",
+      "name": "Page1.f1_18"
+    },
+    "c1_6": {
+      "index": 29,
+      "type": "checkbox",
+      "name": "Page1.Line8_ReadOrder.c1_6"
+    },
+    "f1_19": {
+      "index": 30,
+      "type": "text",
+      "name": "Page1.f1_19"
+    },
+    "f1_20": {
+      "index": 31,
+      "type": "text",
+      "name": "Page1.f1_20"
+    },
+    "f1_21": {
+      "index": 32,
+      "type": "text",
+      "name": "Page1.f1_21"
+    },
+    "f1_22": {
+      "index": 33,
+      "type": "text",
+      "name": "Page1.f1_22"
+    },
+    "f1_23": {
+      "index": 34,
+      "type": "text",
+      "name": "Page1.f1_23"
+    },
+    "f1_24": {
+      "index": 35,
+      "type": "text",
+      "name": "Page1.f1_24"
+    },
+    "f1_25": {
+      "index": 36,
+      "type": "text",
+      "name": "Page1.f1_25"
+    },
+    "f1_26": {
+      "index": 37,
+      "type": "text",
+      "name": "Page1.f1_26"
+    },
+    "f1_27": {
+      "index": 38,
+      "type": "text",
+      "name": "Page1.f1_27"
+    },
+    "f2_01": {
+      "index": 39,
+      "type": "text",
+      "name": "Page2.Line17a_ReadOrder.Line17_ReadOrder.f2_01"
+    },
+    "f2_02": {
+      "index": 40,
+      "type": "text",
+      "name": "Page2.Line17a_ReadOrder.f2_02"
+    },
+    "f2_03": {
+      "index": 41,
+      "type": "text",
+      "name": "Page2.f2_03"
+    },
+    "f2_04": {
+      "index": 42,
+      "type": "text",
+      "name": "Page2.f2_04"
+    },
+    "f2_05": {
+      "index": 43,
+      "type": "text",
+      "name": "Page2.f2_05"
+    },
+    "f2_06": {
+      "index": 44,
+      "type": "text",
+      "name": "Page2.f2_06"
+    },
+    "f2_07": {
+      "index": 45,
+      "type": "text",
+      "name": "Page2.f2_07"
+    },
+    "f2_08": {
+      "index": 46,
+      "type": "text",
+      "name": "Page2.f2_08"
+    },
+    "f2_09": {
+      "index": 47,
+      "type": "text",
+      "name": "Page2.f2_09"
+    },
+    "f2_10": {
+      "index": 48,
+      "type": "text",
+      "name": "Page2.f2_10"
+    },
+    "f2_11": {
+      "index": 49,
+      "type": "text",
+      "name": "Page2.f2_11"
+    },
+    "f2_12": {
+      "index": 50,
+      "type": "text",
+      "name": "Page2.f2_12"
+    },
+    "f2_13": {
+      "index": 51,
+      "type": "text",
+      "name": "Page2.f2_13"
+    },
+    "f2_14": {
+      "index": 52,
+      "type": "text",
+      "name": "Page2.f2_14"
+    },
+    "f2_15": {
+      "index": 53,
+      "type": "text",
+      "name": "Page2.f2_15"
+    },
+    "f2_16": {
+      "index": 54,
+      "type": "text",
+      "name": "Page2.f2_16"
+    },
+    "f2_17": {
+      "index": 55,
+      "type": "text",
+      "name": "Page2.f2_17"
+    },
+    "f2_18": {
+      "index": 56,
+      "type": "text",
+      "name": "Page2.f2_18"
+    },
+    "f2_19": {
+      "index": 57,
+      "type": "text",
+      "name": "Page2.Line17z_ReadOrder.f2_19"
+    },
+    "f2_20": {
+      "index": 58,
+      "type": "text",
+      "name": "Page2.f2_20"
+    },
+    "f2_21": {
+      "index": 59,
+      "type": "text",
+      "name": "Page2.f2_21"
+    },
+    "f2_22": {
+      "index": 60,
+      "type": "text",
+      "name": "Page2.f2_22"
+    },
+    "f2_23": {
+      "index": 61,
+      "type": "text",
+      "name": "Page2.f2_23"
+    },
+    "f2_24": {
+      "index": 62,
+      "type": "text",
+      "name": "Page2.f2_24"
+    }
+  }
+}

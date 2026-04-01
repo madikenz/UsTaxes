@@ -28,7 +28,7 @@ import { createStateReturn as createStateReturn2024 } from 'ustaxes/forms/Y2024/
 import { createStateReturn as createStateReturn2025 } from 'ustaxes/forms/Y2025/stateForms'
 import { createStateReturn as createStateReturn2026 } from 'ustaxes/forms/Y2026/stateForms'
 import { PDFDocument } from 'pdf-lib'
-import { fillPDF } from 'ustaxes/core/pdfFiller/fillPdf'
+import { fillPDF, fillPDFByName } from 'ustaxes/core/pdfFiller/fillPdf'
 import {
   combinePdfs,
   downloadPDF,
@@ -82,13 +82,23 @@ export class YearCreateForm {
   f1040Pdfs = async (): Promise<Either<string[], PDFDocument[]>> => {
     const r1 = await run(this.f1040()).mapAsync((forms) =>
       Promise.all(
-        forms.map(async (form) =>
-          fillPDF(
-            await this.config.getPDF(form),
+        forms.map(async (form) => {
+          const pdf = await this.config.getPDF(form)
+          // Y2025+: Use named field mapping if available
+          if ('namedFields' in form && typeof (form as any).namedFields === 'function') {
+            return fillPDFByName(
+              pdf,
+              (form as any).namedFields(),
+              form.tag
+            )
+          }
+          // Legacy: positional array (tolerant mode)
+          return fillPDF(
+            pdf,
             form.renderedFields(),
             form.tag
           )
-        )
+        })
       )
     )
     return r1.value()

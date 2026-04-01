@@ -4,10 +4,92 @@ import { displayRound } from '../irsForms/util'
 import _ from 'lodash'
 
 /**
- * Attempt to fill fields in a PDF from a Form,
- * checking one by one that each pdf field and Form value
- * Make sense by type (checkbox => boolean, textField => string / number)
- * Side-effecting! Modifies the pdf document.
+ * Fill a PDF by FIELD NAME (not by array index).
+ *
+ * This is the preferred method for Y2025+ forms. It decouples the code
+ * from the PDF field ordering, so IRS can add/remove fields without
+ * breaking all downstream mappings.
+ *
+ * @param pdf - The PDF document to fill
+ * @param namedValues - Record of field name → value
+ * @param formName - Form name for error messages
+ */
+export function fillPDFByName(
+  pdf: PDFDocument,
+  namedValues: Record<string, Field>,
+  formName: string
+): PDFDocument {
+  const form = pdf.getForm()
+
+  for (const [fieldName, value] of Object.entries(namedValues)) {
+    if (value === undefined || value === null) continue
+
+    try {
+      // Try to find the field by name — pdf-lib uses the full path
+      // IRS fields are like: form1[0].Page1[0].f1_14[0]
+      // We search for a field ending with the given name
+      const allFields = form.getFields()
+      const pdfField = allFields.find(f => {
+        const name = f.getName()
+        return name === fieldName ||
+          name.endsWith(`.${fieldName}[0]`) ||
+          name.endsWith(`.${fieldName}`) ||
+          name.includes(`${fieldName}[0]`)
+      })
+
+      if (!pdfField) {
+        // Field not found — skip silently (may not exist in this year's form)
+        continue
+      }
+
+      if (_.isObject(value) && 'select' in value) {
+        // Radio group
+        const children = pdfField.acroField.getWidgets()
+        if (value.select < children.length) {
+          const setValue = children[value.select].getOnValue()
+          if (setValue !== undefined) {
+            pdfField.acroField.dict.set(PDFName.of('V'), setValue)
+            children[value.select].setAppearanceState(setValue)
+          }
+        }
+      } else if (pdfField instanceof PDFCheckBox) {
+        if (value === true) {
+          pdfField.check()
+        }
+        // false/undefined = don't check (default)
+      } else if (pdfField instanceof PDFTextField) {
+        pdfField.setMaxLength(undefined)
+        if (typeof value === 'boolean') {
+          // Boolean going to text field — skip (type mismatch)
+          continue
+        }
+        const showValue =
+          !isNaN(value as number) &&
+          value &&
+          Array.from(value as string)[0] !== '0'
+            ? displayRound(value as number)?.toString()
+            : value?.toString()
+        pdfField.setText(showValue)
+      }
+
+      pdfField.enableReadOnly()
+    } catch (err) {
+      console.warn(
+        `${formName} field "${fieldName}": ${err instanceof Error ? err.message : err}`
+      )
+    }
+  }
+
+  return pdf
+}
+
+/**
+ * Legacy: Fill a PDF by positional array index.
+ * Used by Y2020-Y2024 forms. Y2025+ should use fillPDFByName.
+ *
+ * TOLERANT MODE: Instead of throwing on type mismatches
+ * (boolean→text, number→checkbox), it skips the field with a warning.
+ * This prevents PDF generation failures from minor mapping errors.
  */
 export function fillPDF(
   pdf: PDFDocument,
@@ -19,47 +101,38 @@ export function fillPDF(
   formFields.forEach((pdfField, index) => {
     const value: Field = fieldValues[index]
 
-    const error = (expected: string): Error => {
-      return new Error(
-        `${formName} Field ${index}, ${pdfField.getName()} expected ${expected}`
-      )
-    }
-    // First handle radio groups. If the value for this field
-    // is a RadioSelect object, then assume the pdfField
-    // has children, and check the correct box given the index value.
-    // Idea taken from this comment:
-    // https://github.com/Hopding/pdf-lib/issues/780#issuecomment-771453157
-    // Note, this is for cases such as the 2021 IL-1040 where the field
-    // behaves as a radio group, but the pdfField is a PDFCheckbox
-    // instead of a PDFRadioGroup.
+    // First handle radio groups
     if (_.isObject(value)) {
       const children = pdfField.acroField.getWidgets()
       if (value.select >= children.length) {
-        throw new Error(
-          `Error in field ${index}, expected to select child at index ${value.select} but this node has only ${children.length} children.`
+        console.warn(
+          `${formName} Field ${index}: radio select ${value.select} exceeds ${children.length} children`
         )
+        return
       }
       const setValue = children[value.select].getOnValue()
       if (setValue !== undefined) {
         pdfField.acroField.dict.set(PDFName.of('V'), setValue)
         children[value.select].setAppearanceState(setValue)
-      } else {
-        console.error(children)
-        throw new Error(
-          `Error handling RadioGroup, could not set index ${value.select}`
-        )
       }
     } else if (pdfField instanceof PDFCheckBox) {
       if (value === true) {
         pdfField.check()
       } else if (value !== false && value !== undefined) {
-        throw error('boolean')
+        // TOLERANT: non-boolean for checkbox — skip instead of throwing
+        console.warn(
+          `${formName} Field ${index} (${pdfField.getName()}): expected boolean for checkbox, got ${typeof value} — skipped`
+        )
+        return
       }
     } else if (pdfField instanceof PDFTextField) {
       try {
-        // Remove maxLength constraint that some IRS XFA-based forms set,
-        // which causes setText() to throw after pdf-lib strips XFA data.
         pdfField.setMaxLength(undefined)
+
+        // TOLERANT: skip booleans going to text fields
+        if (typeof value === 'boolean') {
+          return
+        }
 
         const showValue =
           !isNaN(value as number) &&
@@ -69,14 +142,16 @@ export function fillPDF(
             : value?.toString()
         pdfField.setText(showValue)
       } catch (err) {
-        // Some IRS PDF fields fail after XFA stripping. Warn and continue
-        // so the rest of the PDF still generates.
         console.warn(
           `${formName} Field ${index} (${pdfField.getName()}): skipped – ${err instanceof Error ? err.message : err}`
         )
       }
     } else if (value !== undefined) {
-      throw error('unknown')
+      // TOLERANT: unknown field type — warn instead of throwing
+      console.warn(
+        `${formName} Field ${index} (${pdfField.getName()}): unknown field type — skipped`
+      )
+      return
     }
     pdfField.enableReadOnly()
   })

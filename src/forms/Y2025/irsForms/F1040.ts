@@ -855,7 +855,137 @@ export default class F1040 extends F1040Base {
     return result
   }
 
-  // 2025 F1040 PDF — 199 fields aligned to IRS f1040.pdf 2025
+  /**
+   * Named field mapping for 2025 PDF.
+   * Maps semantic names → PDF field IDs → values.
+   * Used by fillPDFByName (preferred over positional fields()).
+   */
+  namedFields = (): Record<string, Field> => {
+    const fm = require('../fieldMaps').F1040_FIELDS as Record<string, string>
+    const vals: Record<string, Field> = {}
+
+    // Helper: set a value using the named map
+    const set = (key: string, value: Field) => {
+      const pdfField = fm[key]
+      if (pdfField && value !== undefined && value !== null) {
+        vals[pdfField] = value
+      }
+    }
+
+    // Header
+    set('first_name', this.info.taxPayer.primaryPerson.firstName)
+    set('last_name', this.info.taxPayer.primaryPerson.lastName)
+    set('ssn', this.info.taxPayer.primaryPerson.ssid)
+    if (this.info.taxPayer.filingStatus === FilingStatus.MFJ && this.info.taxPayer.spouse) {
+      set('spouse_first_name', this.info.taxPayer.spouse.firstName)
+      set('spouse_last_name', this.info.taxPayer.spouse.lastName)
+      set('spouse_ssn', this.info.taxPayer.spouse.ssid)
+    }
+
+    // Address
+    set('address', this.info.taxPayer.primaryPerson.address.address)
+    set('apt_no', this.info.taxPayer.primaryPerson.address.aptNo)
+    set('city', this.info.taxPayer.primaryPerson.address.city)
+    set('state', this.info.taxPayer.primaryPerson.address.state)
+    set('zip', this.info.taxPayer.primaryPerson.address.zip)
+
+    // Filing status (radio select)
+    const fsMap: Record<string, number> = {
+      [FilingStatus.S]: 0, [FilingStatus.MFJ]: 1,
+      [FilingStatus.MFS]: 2, [FilingStatus.HOH]: 3, [FilingStatus.W]: 4,
+    }
+    const fsIdx = fsMap[this.info.taxPayer.filingStatus]
+    if (fsIdx !== undefined) {
+      vals[fm.filing_status] = { select: fsIdx }
+    }
+    if (this.info.taxPayer.filingStatus === FilingStatus.MFS) {
+      set('mfs_spouse_name', this.spouseFullName())
+    }
+
+    // Dependents
+    const deps = this.info.taxPayer.dependents
+    for (let i = 0; i < Math.min(deps.length, 4); i++) {
+      const dep = deps[i]
+      set(`dep${i + 1}_name`, `${dep.firstName} ${dep.lastName}`)
+      set(`dep${i + 1}_ssn`, dep.ssid)
+      set(`dep${i + 1}_rel`, dep.relationship)
+    }
+
+    // Income
+    set('line_1a', this.l1a())
+    set('line_1b', this.l1b())
+    set('line_1c', this.l1c())
+    set('line_1d', this.l1d())
+    set('line_1e', this.l1e())
+    set('line_1f', this.l1f())
+    set('line_1g', this.l1g())
+    set('line_1h', this.l1h())
+    set('line_1i', this.l1i())
+    set('line_1z', this.l1z())
+    set('line_2a', this.l2a())
+    set('line_2b', this.l2b())
+    set('line_3a', this.l3a())
+    set('line_3b', this.l3b())
+    set('line_4a', this.l4a())
+    set('line_4b', this.l4b())
+    set('line_5a', this.l5a())
+    set('line_5b', this.l5b())
+    set('line_6a', this.l6a())
+    set('line_6b', this.l6b())
+    set('line_7', this.l7())
+    set('line_8', this.l8())
+    set('line_9', this.l9())
+    set('line_10', this.l10())
+    set('line_11', this.l11())
+
+    // Page 2
+    set('line_11b', this.l11())
+    set('line_12', this.l12())
+    set('line_13a', this.l13())
+    set('line_14', this.l14())
+    set('line_15', this.l15())
+    set('line_16', this.l16())
+    set('line_17', this.l17())
+    set('line_18', this.l18())
+    set('line_19', this.l19())
+    set('line_20', this.l20())
+    set('line_21', this.l21())
+    set('line_22', this.l22())
+    set('line_23', this.l23())
+    set('line_24', this.l24())
+    set('line_25a', this.l25a())
+    set('line_25b', this.l25b())
+    set('line_25c', this.l25c())
+    set('line_25d', this.l25d())
+    set('line_26', this.l26())
+    set('line_27a', this.l27())
+    set('line_28', this.l28())
+    set('line_29', this.l29())
+    set('line_31', this.l31())
+    set('line_32', this.l32())
+    set('line_33', this.l33())
+    set('line_34', this.l34())
+    set('line_35a', this.l35a())
+    set('line_37', this.l37())
+    set('line_38', this.l38())
+
+    // Refund
+    if (this.info.refund) {
+      set('routing_number', this.info.refund.routingNumber)
+      set('account_number', this.info.refund.accountNumber)
+    }
+
+    // Sign here
+    set('your_occupation', this.occupation(PersonRole.PRIMARY))
+    set('spouse_occupation', this.occupation(PersonRole.SPOUSE))
+    set('phone', this.info.taxPayer.contactPhoneNumber)
+    set('email', this.info.taxPayer.contactEmail)
+
+    return vals
+  }
+
+  // Legacy positional fields — kept for backward compatibility
+  // Y2025 uses namedFields() instead via fillPDFByName
   fields = (): Field[] =>
     [
       // ══ PAGE 1 (128 fields, 0-127) ══
