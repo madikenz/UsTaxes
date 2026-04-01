@@ -148,7 +148,7 @@ export default class ScheduleA extends F1040Attachment {
     this.l6OtherTaxesTypeAndAmount1(),            // [12] f1_12 other taxes desc 1
     this.l6OtherTaxesTypeAndAmount2(),            // [13] f1_13 other taxes desc 2
     this.l6(),                                    // [14] f1_14 other taxes amount
-    this.l7(),                                    // [15] c1_2  interest checkbox (all/not all)
+    this.l8AllMortgageLoan(),                     // [15] c1_2  all mortgage interest checkbox
     this.l8a(),                                   // [16] f1_15 mortgage interest 1098
     this.l8bUnreportedInterest1(),                // [17] f1_16 mortgage not on 1098
     this.l8b(),                                   // [18] f1_17 line 8b
