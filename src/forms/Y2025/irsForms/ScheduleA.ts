@@ -3,6 +3,7 @@ import { FilingStatus, ItemizedDeductions } from 'ustaxes/core/data'
 import { FormTag } from 'ustaxes/core/irsForms/Form'
 import { Field } from 'ustaxes/core/pdfFiller'
 import F1040 from './F1040'
+import { SCHEDULE_A_FIELDS } from '../fieldMaps'
 
 const blankItemizedDeductions = {
   medicalAndDental: 0,
@@ -132,7 +133,7 @@ export default class ScheduleA extends F1040Attachment {
   l18 = (): boolean => false
 
   namedFields = (): Record<string, Field> => {
-    const fm = require('../fieldMaps').SCHEDULE_A_FIELDS as Record<string, string>
+    const fm = SCHEDULE_A_FIELDS
     const vals: Record<string, Field> = {}
     const set = (key: string, value: Field) => {
       const f = fm[key]; if (f && value !== undefined && value !== null) vals[f] = value

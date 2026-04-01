@@ -3,6 +3,7 @@ import { FilingStatus } from 'ustaxes/core/data'
 import { FormTag } from 'ustaxes/core/irsForms/Form'
 import { sumFields } from 'ustaxes/core/irsForms/util'
 import F1040 from './F1040'
+import { SCHEDULE1_FIELDS } from '../fieldMaps'
 import { Field } from 'ustaxes/core/pdfFiller'
 
 export default class Schedule1 extends F1040Attachment {
@@ -235,7 +236,7 @@ export default class Schedule1 extends F1040Attachment {
   to1040Line10 = (): number => this.l26()
 
   namedFields = (): Record<string, Field> => {
-    const fm = require('../fieldMaps').SCHEDULE1_FIELDS as Record<string, string>
+    const fm = SCHEDULE1_FIELDS
     const vals: Record<string, Field> = {}
     const set = (key: string, value: Field) => {
       const f = fm[key]; if (f && value !== undefined && value !== null) vals[f] = value

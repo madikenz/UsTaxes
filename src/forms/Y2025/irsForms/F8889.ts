@@ -3,6 +3,7 @@ import { sumFields } from 'ustaxes/core/irsForms/util'
 import { FormTag } from 'ustaxes/core/irsForms/Form'
 import F8853 from './F8853'
 import { CURRENT_YEAR, healthSavingsAccounts } from '../data/federal'
+import { F8889_FIELDS } from '../fieldMaps'
 import F1040Attachment from './F1040Attachment'
 import F1040 from './F1040'
 import { Field } from 'ustaxes/core/pdfFiller'
@@ -284,7 +285,7 @@ export default class F8889 extends F1040Attachment {
   l21 = (): number => Math.round(this.l20() * 0.1)
 
   namedFields = (): Record<string, Field> => {
-    const fm = require('../fieldMaps').F8889_FIELDS as Record<string, string>
+    const fm = F8889_FIELDS
     const vals: Record<string, Field> = {}
     const set = (key: string, value: Field) => {
       const f = fm[key]; if (f && value !== undefined && value !== null) vals[f] = value

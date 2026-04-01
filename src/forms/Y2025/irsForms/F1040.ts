@@ -8,6 +8,7 @@ import {
   Asset
 } from 'ustaxes/core/data'
 import federalBrackets, { CURRENT_YEAR } from '../data/federal'
+import { F1040_FIELDS } from '../fieldMaps'
 import F4972 from './F4972'
 import F5695 from './F5695'
 import F8814 from './F8814'
@@ -861,7 +862,7 @@ export default class F1040 extends F1040Base {
    * Used by fillPDFByName (preferred over positional fields()).
    */
   namedFields = (): Record<string, Field> => {
-    const fm = require('../fieldMaps').F1040_FIELDS as Record<string, string>
+    const fm = F1040_FIELDS
     const vals: Record<string, Field> = {}
 
     // Helper: set a value using the named map
