@@ -29,11 +29,12 @@ interface F1040WithSummary {
   l12(): number     // Deductions (standard or itemized)
   l15(): number     // Taxable income
   l24(): number     // Total tax
-  l32(): number     // Total credits
+  l32(): number     // Total credits (other payments + refundable)
   l33(): number     // Total payments
   l35a(): number    // Refund amount
   l37(): number     // Amount owed
   standardDeduction(): number | undefined
+  totalForeignTaxCredit(): number  // Sum of all F1116 Line 24
 }
 
 function extractSummary(f1040: unknown, forms: Form[]) {
@@ -48,7 +49,8 @@ function extractSummary(f1040: unknown, forms: Form[]) {
       amountOwed: f.l37(),
       standardDeduction: f.standardDeduction() ?? 0,
       deductions: f.l12(),
-      totalCredits: f.l32(),
+      totalCredits: f.l32() + f.totalForeignTaxCredit(),
+      foreignTaxCredit: f.totalForeignTaxCredit(),
       totalPayments: f.l33()
     },
     forms: forms.map((form) => ({
