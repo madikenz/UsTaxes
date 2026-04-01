@@ -170,72 +170,71 @@ export default class Schedule2 extends F1040Attachment {
   to1040l23 = (): number => this.l21()
   // and on Form 1040 or 1040-SR, line 23, or Form 1040-NR, line 23b
 
+  // 2025 Schedule 2 — 63 fields (12 checkboxes interspersed)
   fields = (): Field[] => [
-    this.f1040.namesString(),
-    this.f1040.info.taxPayer.primaryPerson.ssid,
-
-    this.l1a(),
-    this.l1b(),
-    this.l1c(),
-    this.l1d(),
-    this.l1ei(),
-    this.l1eii(),
-    this.l1eiii(),
-    this.l1eiv(),
-    this.l1e(),
-    this.l1fi(),
-    this.l1fii(),
-    this.l1fiii(),
-    this.l1fiv(),
-    this.l1f(),
-    this.l1y(),
-    this.l1z(),
-    this.l2(),
-    this.l3(),
-
-    this.l4(),
-    this.l5(),
-    this.l6(),
-    this.l7(),
-    this.l8box(),
-    this.l8(),
-    this.l9(),
-    this.l10(),
-    this.l11(),
-    this.l12(),
-    this.l13(),
-    this.l14(),
-    this.l15(),
-    this.l16(),
-    this.l17aDesc(),
-    this.l17a(),
-    this.l17b(),
-    this.l17c(),
-    this.l17d(),
-    this.l17e(),
-    this.l17f(),
-    this.l17g(),
-    this.l17h(),
-    this.l17i(),
-    this.l17j(),
-    this.l17k(),
-    this.l17l(),
-    this.l17m(),
-    this.l17n(),
-    this.l17o(),
-    this.l17p(),
-    this.l17q(),
-    this.l17zDesc(),
-    undefined,
-    this.l17z(),
-    this.l18(),
-    undefined, //this.l19(),
-    this.l20(),
-    this.l21(),
-    // 2025: 4 new fields at end (lines 22-25 or reserved)
-    undefined,                     // [59] f2_21
-    undefined,                     // [60] f2_22
-    undefined,                     // [61] f2_23
-    undefined                      // [62] f2_24
+    this.f1040.namesString(),                    // [ 0] f1_01 name
+    this.f1040.info.taxPayer.primaryPerson.ssid,  // [ 1] f1_02 SSN
+    this.l1a(),                                   // [ 2] f1_03 line 1a AMT
+    this.l1b(),                                   // [ 3] f1_04 line 1b excess premium tax
+    this.l1c(),                                   // [ 4] f1_05 line 1c
+    this.l1d(),                                   // [ 5] f1_06 line 1d
+    this.l1ei(),                                  // [ 6] c1_1  line 1e checkbox i
+    this.l1eii(),                                 // [ 7] c1_1[1] line 1e checkbox ii
+    this.l1eiii(),                                // [ 8] c1_1[2] line 1e checkbox iii
+    this.l1eiv(),                                 // [ 9] c1_1[3] line 1e checkbox iv
+    this.l1e(),                                   // [10] f1_07 line 1e amount
+    this.l1fi(),                                  // [11] c1_2  line 1f checkbox i
+    this.l1fii(),                                 // [12] c1_2[1] line 1f checkbox ii
+    this.l1fiii(),                                // [13] c1_2[2] line 1f checkbox iii
+    this.l1fiv(),                                 // [14] c1_2[3] line 1f checkbox iv
+    this.l1f(),                                   // [15] f1_08 line 1f amount
+    this.l1y(),                                   // [16] f1_09 line 1y
+    this.l1z(),                                   // [17] f1_10 line 1z
+    this.l2(),                                    // [18] f1_11 line 2
+    this.l3(),                                    // [19] f1_12 line 3
+    this.l4(),                                    // [20] f1_13 line 4
+    false,                                        // [21] c1_3  line 4 checkbox (8959)
+    false,                                        // [22] c1_4  line 4 checkbox (8960)
+    false,                                        // [23] c1_5  line 4 checkbox (other)
+    this.l5(),                                    // [24] f1_14 line 5
+    this.l6(),                                    // [25] f1_15 line 6
+    this.l7(),                                    // [26] f1_16 line 7
+    this.l8(),                                    // [27] f1_17 line 8
+    this.l9(),                                    // [28] f1_18 line 9
+    this.l8box(),                                 // [29] c1_6  line 8 checkbox
+    this.l10(),                                   // [30] f1_19 line 10
+    this.l11(),                                   // [31] f1_20 line 11
+    this.l12(),                                   // [32] f1_21 line 12
+    this.l13(),                                   // [33] f1_22 line 13
+    this.l14(),                                   // [34] f1_23 line 14
+    this.l15(),                                   // [35] f1_24 line 15
+    this.l16(),                                   // [36] f1_25 line 16
+    this.l17aDesc(),                              // [37] f1_26 line 17a desc
+    this.l17a(),                                  // [38] f1_27 line 17a
+    // Page 2
+    this.l17b(),                                  // [39] f2_01 line 17b (17a desc cont)
+    this.l17b(),                                  // [40] f2_02 line 17b
+    this.l17c(),                                  // [41] f2_03
+    this.l17d(),                                  // [42] f2_04
+    this.l17e(),                                  // [43] f2_05
+    this.l17f(),                                  // [44] f2_06
+    this.l17g(),                                  // [45] f2_07
+    this.l17h(),                                  // [46] f2_08
+    this.l17i(),                                  // [47] f2_09
+    this.l17j(),                                  // [48] f2_10
+    this.l17k(),                                  // [49] f2_11
+    this.l17l(),                                  // [50] f2_12
+    this.l17m(),                                  // [51] f2_13
+    this.l17n(),                                  // [52] f2_14
+    this.l17o(),                                  // [53] f2_15
+    this.l17p(),                                  // [54] f2_16
+    this.l17q(),                                  // [55] f2_17
+    this.l17zDesc(),                              // [56] f2_18
+    this.l17z(),                                  // [57] f2_19 line 17z
+    this.l18(),                                   // [58] f2_20 line 18
+    undefined,                                    // [59] f2_21 line 19
+    this.l20(),                                   // [60] f2_22 line 20
+    this.l21(),                                   // [61] f2_23 line 21
+    undefined                                     // [62] f2_24
   ]
 }
