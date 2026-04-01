@@ -232,3 +232,92 @@ export const SCHEDULE_A_FIELDS: Record<string, string> = {
   line_18: 'f1_30',
   itemize_check: 'c1_3',
 }
+
+// Schedule 2 — Additional Taxes
+export const SCHEDULE2_FIELDS: Record<string, string> = {
+  name: 'f1_01',
+  ssn: 'f1_02',
+  // Part I
+  line_1a: 'f1_03',
+  line_1b: 'f1_04',
+  line_1c: 'f1_05',
+  line_1d: 'f1_06',
+  line_1e: 'f1_07',
+  line_1f: 'f1_08',
+  line_1y: 'f1_09',
+  line_1z: 'f1_10',
+  line_2: 'f1_11',
+  line_3: 'f1_12',
+  // Part II
+  line_4: 'f1_13',
+  line_5: 'f1_14',
+  line_6: 'f1_15',
+  line_7: 'f1_16',
+  line_8: 'f1_17',
+  line_9: 'f1_18',
+  line_10: 'f1_19',
+  line_11: 'f1_20',  // Additional Medicare Tax
+  line_12: 'f1_21',  // NIIT
+  line_13: 'f1_22',
+  line_14: 'f1_23',
+  line_15: 'f1_24',
+  line_16: 'f1_25',
+  // Page 2
+  line_17a_desc: 'f2_01',
+  line_17a: 'f2_02',
+  line_17b: 'f2_03',
+  line_17c: 'f2_04',
+  line_17d: 'f2_05',
+  line_17e: 'f2_06',
+  line_17f: 'f2_07',
+  line_17g: 'f2_08',
+  line_17h: 'f2_09',
+  line_17i: 'f2_10',
+  line_17j: 'f2_11',
+  line_17k: 'f2_12',
+  line_17l: 'f2_13',
+  line_17m: 'f2_14',
+  line_17n: 'f2_15',
+  line_17o: 'f2_16',
+  line_17p: 'f2_17',
+  line_17q: 'f2_18',
+  line_17z_desc: 'f2_19',
+  line_17z: 'f2_20',
+  line_18: 'f2_21',
+  line_19: 'f2_22',
+  line_20: 'f2_23',
+  line_21: 'f2_24',
+}
+
+// Form 8889 — HSA
+export const F8889_FIELDS: Record<string, string> = {
+  name: 'f1_1',
+  ssn: 'f1_2',
+  self_only: 'c1_1',
+  family: 'c1_1[1]',
+  // Part I
+  line_2: 'f1_3',
+  line_3: 'f1_4',
+  line_4: 'f1_5',
+  line_5: 'f1_6',
+  line_6: 'f1_7',
+  line_7: 'f1_8',
+  line_8: 'f1_9',
+  line_9: 'f1_10',
+  line_10: 'f1_11',
+  line_11: 'f1_12',
+  line_12: 'f1_13',
+  line_13: 'f1_14',  // HSA deduction
+  // Part II
+  line_14a: 'f1_15',
+  line_14b: 'f1_16',
+  line_14c: 'f1_17',
+  line_15: 'f1_18',
+  line_16: 'f1_19',
+  line_17b: 'f1_20',
+  // Part III
+  line_18: 'f1_21',
+  line_19: 'f1_22',
+  line_20: 'f1_23',
+  line_21: 'f1_24',
+}

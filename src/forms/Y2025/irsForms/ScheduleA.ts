@@ -131,6 +131,57 @@ export default class ScheduleA extends F1040Attachment {
 
   l18 = (): boolean => false
 
+  namedFields = (): Record<string, Field> => {
+    const fm = require('../fieldMaps').SCHEDULE_A_FIELDS as Record<string, string>
+    const vals: Record<string, Field> = {}
+    const set = (key: string, value: Field) => {
+      const f = fm[key]; if (f && value !== undefined && value !== null) vals[f] = value
+    }
+    set('name', this.f1040.namesString())
+    set('ssn', this.f1040.info.taxPayer.primaryPerson.ssid)
+    // Medical
+    set('line_1', this.l1())
+    set('line_2', this.l2())
+    set('line_3', this.l3())
+    set('line_4', this.l4())
+    // SALT
+    set('sales_tax_check', this.l5aSalesTax())
+    set('line_5a', this.l5a())
+    set('line_5b', this.l5b())
+    set('line_5c', this.l5c())
+    set('line_5d', this.l5d())
+    set('line_5e', this.l5e())
+    // Other taxes
+    set('line_6_desc1', this.l6OtherTaxesTypeAndAmount1())
+    set('line_6_desc2', this.l6OtherTaxesTypeAndAmount2())
+    set('line_6', this.l6())
+    // Interest
+    set('mortgage_check', this.l8AllMortgageLoan())
+    set('line_8a', this.l8a())
+    set('line_8b_desc', this.l8bUnreportedInterest1())
+    set('line_8b', this.l8b())
+    set('line_8c', this.l8c())
+    set('line_8d', this.l8d())
+    set('line_8e', this.l8e())
+    // Investment interest
+    set('line_9', this.l9())
+    // Charity
+    set('line_10', this.l10())
+    set('line_11', this.l11())
+    set('line_12', this.l12())
+    set('line_13', this.l13())
+    // Casualty
+    set('line_14', this.l14())
+    // Other
+    set('line_15', this.l15())
+    set('line_16', this.l16())
+    // Total
+    set('line_17', this.l17())
+    set('line_18', this.l18())
+    set('itemize_check', this.l17() > (this.f1040.standardDeduction() ?? 0))
+    return vals
+  }
+
   // 2025 Schedule A — 33 fields (was 37 in 2024: removed l16 detail fields)
   fields = (): Field[] => [
     this.f1040.namesString(),                    // [ 0] f1_1  name

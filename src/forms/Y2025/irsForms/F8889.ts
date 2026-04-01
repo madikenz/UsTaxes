@@ -283,6 +283,46 @@ export default class F8889 extends F1040Attachment {
   l20 = (): number => sumFields([this.l18(), this.l19()])
   l21 = (): number => Math.round(this.l20() * 0.1)
 
+  namedFields = (): Record<string, Field> => {
+    const fm = require('../fieldMaps').F8889_FIELDS as Record<string, string>
+    const vals: Record<string, Field> = {}
+    const set = (key: string, value: Field) => {
+      const f = fm[key]; if (f && value !== undefined && value !== null) vals[f] = value
+    }
+    set('name', this.f1040.namesString())
+    set('ssn', this.f1040.info.taxPayer.primaryPerson.ssid)
+    // Coverage type — check if any HSA has family coverage
+    const hasFamily = this.hsas.some((h) => h.coverageType === 'family')
+    set('self_only', !hasFamily)
+    set('family', hasFamily)
+    // Part I
+    set('line_2', this.l2())
+    set('line_3', this.l3())
+    set('line_4', this.l4())
+    set('line_5', this.l5())
+    set('line_6', this.l6())
+    set('line_7', this.l7())
+    set('line_8', this.l8())
+    set('line_9', this.l9())
+    set('line_10', this.l10())
+    set('line_11', this.l11())
+    set('line_12', this.l12())
+    set('line_13', this.l13())
+    // Part II — Distributions
+    set('line_14a', this.l14a())
+    set('line_14b', this.l14b())
+    set('line_14c', this.l14c())
+    set('line_15', this.l15())
+    set('line_16', this.l16())
+    set('line_17b', this.l17b())
+    // Part III
+    set('line_18', this.l18())
+    set('line_19', this.l19())
+    set('line_20', this.l20())
+    set('line_21', this.l21())
+    return vals
+  }
+
   fields = (): Field[] => [
     `${this.person.firstName} ${this.person.lastName}`,
     this.person.ssid,

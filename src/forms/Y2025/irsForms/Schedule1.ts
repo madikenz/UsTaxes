@@ -234,6 +234,71 @@ export default class Schedule1 extends F1040Attachment {
 
   to1040Line10 = (): number => this.l26()
 
+  namedFields = (): Record<string, Field> => {
+    const fm = require('../fieldMaps').SCHEDULE1_FIELDS as Record<string, string>
+    const vals: Record<string, Field> = {}
+    const set = (key: string, value: Field) => {
+      const f = fm[key]; if (f && value !== undefined && value !== null) vals[f] = value
+    }
+    // Page 1 — Additional Income
+    set('name', this.f1040.namesString())
+    set('ssn', this.f1040.info.taxPayer.primaryPerson.ssid)
+    set('line_1', this.l1())
+    set('line_2a', this.l2a())
+    set('line_2b', this.l2b())
+    set('line_3', this.l3())
+    set('line_4', this.l4())
+    set('schedule_c_check', this.f1040.scheduleC?.isNeeded() ?? false)
+    set('schedule_f_check', this.f1040.scheduleF?.isNeeded() ?? false)
+    set('line_5', this.l5())
+    set('line_6', this.l6())
+    set('line_7', this.l7())
+    set('line_8a', this.l8a())
+    set('line_8b', this.l8b())
+    set('line_8c', this.l8c())
+    set('line_8d', this.l8d())
+    set('line_8e', this.l8e())
+    set('line_8f', this.l8f())
+    set('line_8g', this.l8g())
+    set('line_8h', this.l8h())
+    set('line_8i', this.l8i())
+    set('line_8j', this.l8j())
+    set('line_8k', this.l8k())
+    set('line_8l', this.l8l())
+    set('line_8m', this.l8m())
+    set('line_8n', this.l8n())
+    set('line_8o', this.l8o())
+    set('line_8p', this.l8p())
+    set('line_8q', this.l8q())
+    set('line_8r', this.l8r())
+    set('line_8s', this.l8s())
+    set('line_8t', this.l8t())
+    set('line_8u', this.l8u())
+    set('line_8v', this.l8v())
+    set('line_8z_desc', Array.from(this.otherIncomeStrings).join(' '))
+    set('line_8z', this.l8z())
+    set('line_9', this.l9())
+    set('line_10', this.l10())
+    // Page 2 — Adjustments to Income
+    set('name_p2', this.f1040.namesString())
+    set('ssn_p2', this.f1040.info.taxPayer.primaryPerson.ssid)
+    set('line_11', this.l11())
+    set('line_12', this.l12())
+    set('line_13', this.l13())
+    set('line_15', this.l15())
+    set('line_16', this.l16())
+    set('line_17', this.l17())
+    set('line_18', this.l18())
+    set('line_19a', this.l19a())
+    set('line_19b', this.l19b())
+    set('line_19c', this.l19c())
+    set('line_20', this.l20())
+    set('line_21', this.l21())
+    set('line_23', this.l23())
+    set('line_25', this.l25())
+    return vals
+  }
+
   fields = (): Field[] => [
     // Page 1 — 41 fields (indices 0-40)
     this.f1040.namesString(),                          // 0: f1_01 name

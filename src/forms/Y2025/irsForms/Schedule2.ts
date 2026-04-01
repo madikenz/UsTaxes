@@ -170,6 +170,53 @@ export default class Schedule2 extends F1040Attachment {
   to1040l23 = (): number => this.l21()
   // and on Form 1040 or 1040-SR, line 23, or Form 1040-NR, line 23b
 
+  namedFields = (): Record<string, Field> => {
+    const fm = require('../fieldMaps').SCHEDULE2_FIELDS as Record<string, string>
+    const vals: Record<string, Field> = {}
+    const set = (key: string, value: Field) => {
+      const f = fm[key]; if (f && value !== undefined && value !== null) vals[f] = value
+    }
+    set('name', this.f1040.namesString())
+    set('ssn', this.f1040.info.taxPayer.primaryPerson.ssid)
+    // Part I
+    set('line_1a', this.l1a())
+    set('line_1b', this.l1b())
+    set('line_1c', this.l1c())
+    set('line_1d', this.l1d())
+    set('line_1e', this.l1e())
+    set('line_1f', this.l1f())
+    set('line_1y', this.l1y())
+    set('line_1z', this.l1z())
+    set('line_2', this.l2())
+    set('line_3', this.l3())
+    // Part II
+    set('line_4', this.l4())
+    set('line_5', this.l5())
+    set('line_6', this.l6())
+    set('line_7', this.l7())
+    set('line_8', this.l8())
+    set('line_9', this.l9())
+    set('line_11', this.l11())
+    set('line_12', this.l12())
+    set('line_13', this.l13())
+    // Page 2
+    set('line_17a_desc', this.l17aDesc())
+    set('line_17a', this.l17a())
+    set('line_17b', this.l17b())
+    set('line_17c', this.l17c())
+    set('line_17d', this.l17d())
+    set('line_17e', this.l17e())
+    set('line_17f', this.l17f())
+    set('line_17g', this.l17g())
+    set('line_17h', this.l17h())
+    set('line_17z_desc', this.l17zDesc())
+    set('line_17z', this.l17z())
+    set('line_18', this.l18())
+    set('line_20', this.l20())
+    set('line_21', this.l21())
+    return vals
+  }
+
   // 2025 Schedule 2 — 63 fields (12 checkboxes interspersed)
   fields = (): Field[] => [
     this.f1040.namesString(),                    // [ 0] f1_01 name
